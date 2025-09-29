@@ -3,57 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRUD de Produtos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="../styles/style.css">
+    <title>Gerenciamento de Vagas PCD</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1 class="titulo-principal">Gerenciamento de Produtos</h1>
-        </header>
+<div class="container mx-auto p-4 md:p-8">
+    <!-- HEADER -->
+    <header class="bg-white shadow-lg rounded-xl p-6 mb-8 text-center border-t-4 border-indigo-600">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-indigo-700">
+            <i class="fas fa-handshake mr-3 text-indigo-500"></i>
+            Gerenciamento de Oportunidades PCD
+        </h1>
+        <p class="text-gray-500 mt-2">Plataforma administrativa para vagas de inclusão.</p>
+    </header>
 
-        <section class="card formulario-section">
-            <h2 class="subtitulo">Cadastro/Edição de Produto</h2>
-            <form id="form-produto" class="form-produto">
-                <input type="hidden" id="produto-id">
-                
-                <div class="form-group">
-                    <label for="descricao">Descrição:</label>
-                    <input type="text" id="descricao" class="input-text" placeholder="Nome ou Descrição do Produto" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="preco">Preço (R$):</label>
-                    <input type="number" step="0.01" id="preco" class="input-number" placeholder="0.00" required>
-                </div>
-                
-                <button type="submit" class="btn btn-salvar">Salvar</button>
-            </form>
-        </section>
-        
-        <hr class="separador">
+    <!-- FORMULÁRIO -->
+    <section class="bg-white p-6 md:p-8 rounded-xl shadow-2xl mb-10">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3 flex items-center">
+            <i class="fas fa-edit mr-3 text-indigo-500"></i>
+            <span id="form-title">Cadastrar Nova Vaga</span>
+        </h2>
 
-        <section class="tabela-section">
-            <h2 class="subtitulo">Produtos Cadastrados</h2>
-            <div class="tabela-responsiva">
-                <table class="tabela-produtos">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Descrição</th>
-                            <th>Preço</th>
-                            <th class="acoes-header">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-produtos">
-                        </tbody>
-                </table>
+        <form id="form-produto" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <input type="hidden" id="produto-id">
+
+            <div class="md:col-span-1">
+                <label for="empresa" class="block text-sm font-medium text-gray-700 mb-1">Empresa</label>
+                <input type="text" id="empresa" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Nome da Empresa" required>
             </div>
-        </section>
-    </div>
+            <div class="md:col-span-2">
+                <label for="titulo_vaga" class="block text-sm font-medium text-gray-700 mb-1">Título da Vaga</label>
+                <input type="text" id="titulo_vaga" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Ex: Analista de RH Júnior" required>
+            </div>
 
-    <script src="../scripts/main.js"></script>
+            <div class="md:col-span-1">
+                <label for="salario" class="block text-sm font-medium text-gray-700 mb-1">Salário (R$)</label>
+                <input type="number" step="0.01" id="salario" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="0.00" required>
+            </div>
+            <div class="md:col-span-1">
+                <label for="tipo_contrato" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Contrato</label>
+                <input type="text" id="tipo_contrato" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="CLT, PJ, Estágio...">
+            </div>
+            <div class="md:col-span-1">
+                <label for="tipo_deficiencia" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Deficiência</label>
+                <input type="text" id="tipo_deficiencia" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Visual, Auditiva, Física..." required>
+            </div>
+
+            <div class="md:col-span-2">
+                <label for="endereco" class="block text-sm font-medium text-gray-700 mb-1">Localização</label>
+                <input type="text" id="endereco" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Cidade, Estado ou Remoto" required>
+            </div>
+            <div class="md:col-span-1">
+                <label for="beneficios" class="block text-sm font-medium text-gray-700 mb-1">Benefícios</label>
+                <input type="text" id="beneficios" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="VR, Plano de Saúde...">
+            </div>
+
+            <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="texto" class="block text-sm font-medium text-gray-700 mb-1">Descrição Detalhada da Vaga</label>
+                    <textarea id="texto" class="w-full p-3 border border-gray-300 rounded-lg resize-y" placeholder="Descreva as responsabilidades" rows="4" required></textarea>
+                </div>
+                <div>
+                    <label for="requisitos" class="block text-sm font-medium text-gray-700 mb-1">Requisitos e Qualificações</label>
+                    <textarea id="requisitos" class="w-full p-3 border border-gray-300 rounded-lg resize-y" placeholder="Conhecimentos, habilidades e experiências" rows="4"></textarea>
+                </div>
+            </div>
+
+            <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="data_publicacao" class="block text-sm font-medium text-gray-700 mb-1">Data de Publicação</label>
+                    <input type="date" id="data_publicacao" class="w-full p-3 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label for="data_expiracao" class="block text-sm font-medium text-gray-700 mb-1">Data de Expiração</label>
+                    <input type="date" id="data_expiracao" class="w-full p-3 border border-gray-300 rounded-lg">
+                </div>
+            </div>
+
+            <div class="md:col-span-3 pt-4">
+                <button type="submit" id="btn-submit" class="w-full py-3 px-6 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-200">
+                    <i class="fas fa-save mr-2"></i> Salvar Vaga
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- TABELA DE VAGAS -->
+    <section class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3 flex items-center">
+            <i class="fas fa-list-alt mr-3 text-indigo-500"></i> Vagas Cadastradas
+        </h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 tabela-vagas">
+                <thead class="bg-indigo-600 text-white uppercase text-sm leading-normal">
+                    <tr>
+                        <th class="py-3 px-6 text-left">ID</th>
+                        <th class="py-3 px-6 text-left">Empresa</th>
+                        <th class="py-3 px-6 text-left">Título</th>
+                        <th class="py-3 px-6 text-left">Deficiência</th>
+                        <th class="py-3 px-6 text-center">Salário</th>
+                        <th class="py-3 px-6 text-left">Publicação</th>
+                        <th class="py-3 px-6 text-left">Expiração</th>
+                        <th class="py-3 px-6 text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-produtos" class="bg-white divide-y divide-gray-200 text-gray-600 text-sm font-light">
+                    <!-- Dados preenchidos pelo JS -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<!-- LINK PARA O JS -->
+<script src="../scripts/main.js"></script>
 </body>
 </html>

@@ -1,68 +1,81 @@
 const API_URL = "http://localhost:8080";
 
-// Buscar todos os produtos
+// Buscar todas as vagas
 async function fetchDados() {
   try {
-    const response = await fetch(`${API_URL}/produtos`);
+    const response = await fetch(`${API_URL}/vagas`);
 
     if (!response.ok) {
-      throw new Error("Erro ao buscar produtos");
+      throw new Error("Erro ao buscar vagas");
     }
 
     const data = await response.json();
     const tbody = document.getElementById("tabela-produtos");
     tbody.innerHTML = "";
 
-    data.forEach(produto => {
-      const tr = document.createElement("tr");
-      const descricaoEscapada = encodeURIComponent(produto.descricao);
+    data.forEach(vaga => {
+      const empresaEscapada = encodeURIComponent(vaga.empresa);
+      const tituloEscapado = encodeURIComponent(vaga.tituloVaga);
 
+      const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${produto.id}</td>
-        <td>${produto.descricao}</td>
-        <td>R$ ${produto.preco.toFixed(2)}</td>
+        <td>${vaga.id}</td>
+        <td>${vaga.empresa}</td>
+        <td>${vaga.tituloVaga}</td>
+        <td>${vaga.tipoDeficiencia}</td>
+        <td>R$ ${vaga.salario.toFixed(2)}</td>
+        <td>${vaga.dataPublicacao}</td>
+        <td>${vaga.dataExpiracao}</td>
         <td>
-          <button onclick="editarProduto(${produto.id}, '${descricaoEscapada}', ${produto.preco})">Editar</button>
-          <button onclick="deletarProduto(${produto.id})">Excluir</button>
+          <button onclick="editarProduto(${vaga.id}, '${empresaEscapada}', '${tituloEscapado}', '${vaga.texto}', '${vaga.tipoDeficiencia}', '${vaga.endereco}', ${vaga.salario}, '${vaga.beneficios}', '${vaga.tipoContrato}', '${vaga.requisitos}', '${vaga.dataPublicacao}', '${vaga.dataExpiracao}')">Editar</button>
+          <button onclick="deletarProduto(${vaga.id})">Excluir</button>
         </td>
       `;
       tbody.appendChild(tr);
     });
   } catch (error) {
-    console.error("Erro ao carregar produtos:", error);
+    console.error("Erro ao carregar vagas:", error);
   }
 }
 
-// Salvar ou atualizar produto
+// Salvar ou atualizar vaga
 async function salvarProduto(event) {
   event.preventDefault();
 
   const id = document.getElementById("produto-id").value;
-  const descricao = document.getElementById("descricao").value;
-  const preco = parseFloat(document.getElementById("preco").value);
-
-  const produto = { id, descricao, preco };
+  const vaga = {
+    id,
+    empresa: document.getElementById("empresa").value,
+    tituloVaga: document.getElementById("titulo_vaga").value,
+    texto: document.getElementById("texto").value,
+    tipoDeficiencia: document.getElementById("tipo_deficiencia").value,
+    endereco: document.getElementById("endereco").value,
+    salario: parseFloat(document.getElementById("salario").value),
+    beneficios: document.getElementById("beneficios").value,
+    tipoContrato: document.getElementById("tipo_contrato").value,
+    requisitos: document.getElementById("requisitos").value,
+    dataPublicacao: document.getElementById("data_publicacao").value,
+    dataExpiracao: document.getElementById("data_expiracao").value
+  };
 
   try {
     let response;
     if (id) {
-      // Atualizar (PUT)
-      response = await fetch(`${API_URL}/produto/update`, {
+      response = await fetch(`${API_URL}/vagas/update`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(produto)
+        body: JSON.stringify(vaga)
       });
     } else {
-      // Criar (POST)
-      response = await fetch(`${API_URL}/produtos/add`, {
+      response = await fetch(`${API_URL}/vagas/add`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(produto)
+        body: JSON.stringify(vaga)
       });
     }
 
     if (!response.ok) {
-      throw new Error("Erro ao salvar produto");
+      throw new Error("Erro ao salvar vaga");
     }
 
     document.getElementById("form-produto").reset();
@@ -72,14 +85,14 @@ async function salvarProduto(event) {
   }
 }
 
-// Deletar produto
+// Deletar vaga
 async function deletarProduto(id) {
-  if (confirm("Deseja excluir este produto?")) {
+  if (confirm("Deseja excluir esta vaga?")) {
     try {
-      const response = await fetch(`${API_URL}/produto/delete/${id}`, { method: "DELETE" });
+      const response = await fetch(`${API_URL}/vagas/delete/${id}`, { method: "DELETE" });
 
       if (!response.ok) {
-        throw new Error("Erro ao excluir produto");
+        throw new Error("Erro ao excluir vaga");
       }
 
       fetchDados();
@@ -89,16 +102,24 @@ async function deletarProduto(id) {
   }
 }
 
-// Editar produto (preenche o formulário)
-function editarProduto(id, descricaoEscapada, preco) {
-  const descricao = decodeURIComponent(descricaoEscapada);
+// Editar vaga (preenche o formulário)
+function editarProduto(id, empresa, tituloVaga, texto, tipoDeficiencia, endereco, salario, beneficios, tipoContrato, requisitos, dataPublicacao, dataExpiracao) {
   document.getElementById("produto-id").value = id;
-  document.getElementById("descricao").value = descricao;
-  document.getElementById("preco").value = preco;
+  document.getElementById("empresa").value = decodeURIComponent(empresa);
+  document.getElementById("titulo_vaga").value = decodeURIComponent(tituloVaga);
+  document.getElementById("texto").value = texto;
+  document.getElementById("tipo_deficiencia").value = tipoDeficiencia;
+  document.getElementById("endereco").value = endereco;
+  document.getElementById("salario").value = salario;
+  document.getElementById("beneficios").value = beneficios;
+  document.getElementById("tipo_contrato").value = tipoContrato;
+  document.getElementById("requisitos").value = requisitos;
+  document.getElementById("data_publicacao").value = dataPublicacao;
+  document.getElementById("data_expiracao").value = dataExpiracao;
 }
 
 // Listener do formulário
 document.getElementById("form-produto").addEventListener("submit", salvarProduto);
 
-// Carregar produtos na inicialização
+// Carregar vagas na inicialização
 fetchDados();
