@@ -1,0 +1,151 @@
+/* RESET E TIPOGRAFIA BÁSICA */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif; /* Fonte moderna */
+    background-color: #f4f7f6; /* Fundo suave */
+    color: #333;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto; /* Centraliza o conteúdo */
+}
+
+/* HEADER */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.titulo-principal {
+    color: #007bff; /* Uma cor primária para destaque */
+    font-weight: 700;
+}
+
+/* CARTÕES E SEÇÕES */
+.card {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.subtitulo {
+    margin-top: 0;
+    color: #555;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* FORMULÁRIO */
+.form-produto {
+    display: flex;
+    gap: 15px; /* Espaçamento entre os campos */
+    flex-wrap: wrap;
+    align-items: flex-end; /* Alinha o botão com os inputs */
+}
+
+.form-group {
+    flex: 1; /* Permite que os campos cresçam */
+    min-width: 250px; /* Garante que não fiquem muito pequenos */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.input-text, .input-number {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+.input-text:focus, .input-number:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* BOTÃO */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.1s;
+    white-space: nowrap; /* Evita quebra de linha no texto do botão */
+}
+
+.btn-salvar {
+    background-color: #28a745; /* Cor verde para salvar/sucesso */
+    color: white;
+}
+
+.btn-salvar:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+/* TABELA */
+.tabela-responsiva {
+    overflow-x: auto; /* Garante scroll horizontal em telas pequenas */
+}
+
+.tabela-produtos {
+    width: 100%;
+    border-collapse: collapse; /* Bordas unidas */
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden; /* Para bordas arredondadas funcionarem */
+}
+
+.tabela-produtos th, .tabela-produtos td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.tabela-produtos thead th {
+    background-color: #007bff;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+.tabela-produtos tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Zebra striping para melhor leitura */
+}
+
+.tabela-produtos tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Estilo para as Ações (botões de Editar/Excluir) que você criará no JS */
+.acoes-header {
+    text-align: center;
+}
+
+.tabela-produtos td:last-child {
+    text-align: center;
+}

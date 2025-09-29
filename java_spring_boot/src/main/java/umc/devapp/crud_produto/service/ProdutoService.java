@@ -1,12 +1,13 @@
 package umc.devapp.crud_produto.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import umc.devapp.crud_produto.entity.Produto;
-import umc.devapp.crud_produto.repository.ProdutoRepository;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import umc.devapp.crud_produto.entity.Produto;
+import umc.devapp.crud_produto.repository.ProdutoRepository;
 
 @Service
 public class ProdutoService {
