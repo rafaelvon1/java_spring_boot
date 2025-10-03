@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input e Botão Simples</title>
+    <style>
+        /* CSS BÁSICO PARA VISUAL LIMPO */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f9;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        /* ESTILO DO CAMPO DE INPUT */
+        #meuInput {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box; /* Garante que o padding não aumente a largura total */
+            font-size: 16px;
+        }
+        
+        #meuInput:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* ESTILO DO BOTÃO */
+        #meuBotao {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        #meuBotao:hover {
+            background-color: #0056b3;
+        }
+        
+        #resultado {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Empresa</h2>
+        
+        <input type="text" id="meuInput" placeholder="Nome da Empresa">
+        
+        <button id="Pesquisar" onclick="fetchDados()">Enviar</button>
+        
+        <p id="resultado"></p>
+    </div>
+
+    <script>
+        // JAVASCRIPT SIMPLES PARA FAZER O BOTÃO FUNCIONAR
+        function mostrarValor() {
+            // Pega o valor do input
+            const valor = document.getElementById('meuInput').value;
+            
+            // Exibe o valor em um parágrafo
+            const resultado = document.getElementById('resultado');
+            
+            if (valor.trim() === "") {
+                resultado.textContent = "Por favor, digite algo no campo.";
+            } else {
+                resultado.textContent = `Você digitou: "${valor}"`;
+            }
+        }
+    </script>
+
+</body>
+</html>
