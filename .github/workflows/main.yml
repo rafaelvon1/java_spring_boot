@@ -19,9 +19,14 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
+          # cria o arquivo de review para garantir que ele exista
+          echo "## 🤖 Revisão Automática de Código com IA" > review.md
+          
+          # percorre todos os arquivos modificados
           for file in ${{ steps.files.outputs.files }}; do
             echo "📂 Analisando $file"
-            content=$(cat $file | head -n 2000) # evita enviar arquivo gigante
+            content=$(cat $file | head -n 2000 || echo "Arquivo muito grande ou não encontrado")
+            
             response=$(curl -s https://api.openai.com/v1/chat/completions \
               -H "Content-Type: application/json" \
               -H "Authorization: Bearer $OPENAI_API_KEY" \
