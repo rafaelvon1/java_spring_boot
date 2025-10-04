@@ -1,20 +1,16 @@
 {
   "name": "java_spring_boot",
   "version": "1.0.0",
-  "lockfileVersion": 3,
-  "requires": true,
-  "author": "rafael",
   "description": "Projeto Spring Boot com frontend em React",
-  "license": "ISC",
   "main": "index.js",
-  "packages": {},
-  "devDependencies": {
-    "react-scripts": "^5.0.1"
-  },
   "scripts": {
-    "build": "react-scripts build",
-    "eject": "react-scripts eject",
-    "start": "react-scripts start",
-    "test": "react-scripts test"
-  }
+    "start": "echo 'Nada para rodar'",
+    "build": "echo 'Nada para rodar'",
+    "test": "echo 'Nada para rodar'",
+    "eject": "echo 'Nada para rodar'"
+  },
+  "author": "rafael",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {}
 }
