@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Interesse em Vagas</title>
+    <style>
+        /* Estilos CSS básicos para a página */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="email"],
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Garante que o padding não aumente o tamanho total */
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            display: none; /* Inicialmente escondida */
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Receba Vagas Personalizadas</h1>
+    <form id="interestForm">
+
+        <div class="form-group">
+            <label for="email">Seu Melhor E-mail:</label>
+            <input type="email" id="email" name="email" placeholder="exemplo@dominio.com" required>
+        </div>
+
+        <div class="form-group">
+            <label for="area">Área de Interesse Principal:</label>
+            <select id="area" name="area" required>
+                <option value="">Selecione uma área</option>
+                <option value="Tecnologia">Tecnologia/TI</option>
+                <option value="Marketing">Marketing Digital</option>
+                <option value="Vendas">Comercial/Vendas</option>
+                <option value="Financeiro">Financeiro/Contabilidade</option>
+                <option value="Recursos Humanos">Recursos Humanos</option>
+                <option value="Outra">Outra</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="salario">Salário Mínimo Desejado (R$):</label>
+            <input type="number" id="salario" name="salario" placeholder="Ex: 4000" min="0" required>
+        </div>
+
+        <button type="submit">Cadastrar Preferências</button>
+
+    </form>
+    
+    <div id="message" class="success"></div>
+
+</div>
+
+<script>
+    // Script JavaScript para validação e simulação de envio
+    document.getElementById('interestForm').addEventListener('submit', function(event) {
+        // Previne o comportamento padrão de envio do formulário (que recarregaria a página)
+        event.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const area = document.getElementById('area').value;
+        const salario = document.getElementById('salario').value;
+        const messageDiv = document.getElementById('message');
+
+        // Validação simples: verifica se os campos obrigatórios estão preenchidos
+        if (email && area && salario) {
+            // Se os dados estivessem sendo enviados para um servidor (backend), 
+            // o código de envio estaria aqui (usando Fetch API, Axios, etc.).
+
+            // SIMULAÇÃO: Exibe a mensagem de sucesso
+            messageDiv.style.display = 'block';
+            messageDiv.innerHTML = `Obrigado, **${email}**! Seu interesse na área de **${area}** com salário a partir de **R$ ${salario}** foi registrado. Você receberá as vagas por e-mail.`;
+            
+            // Opcional: Limpa o formulário após o "envio"
+            this.reset();
+            
+            // Esconde a mensagem após 5 segundos
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+
+        } else {
+            // Se a validação do atributo 'required' não for suficiente
+            messageDiv.style.display = 'block';
+            messageDiv.className = 'success'; // Reutilizando a classe, mas idealmente teria uma 'error'
+            messageDiv.innerHTML = 'Por favor, preencha todos os campos.';
+        }
+    });
+</script>
+
+</body>
+</html>
