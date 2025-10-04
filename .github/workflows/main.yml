@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # pega todo o histórico para garantir diffs corretos
 
       - name: Install dependencies
         run: |
@@ -24,9 +26,12 @@ jobs:
       - name: Get diff of all changes
         id: diff
         run: |
-          # Pega o diff completo do PR (adições, deleções, modificações)
-          git fetch origin main
-          git diff origin/main...HEAD --unified=0 > full_diff.diff
+          # Pega o commit base da branch do PR
+          BASE_SHA=${{ github.event.pull_request.base.sha }}
+          echo "Base commit: $BASE_SHA"
+
+          # Gera o diff completo entre a base e o HEAD da branch do PR
+          git diff $BASE_SHA...HEAD --unified=0 > full_diff.diff
           echo "diff_file=full_diff.diff" >> $GITHUB_OUTPUT
 
       - name: AI Review with OpenAI
