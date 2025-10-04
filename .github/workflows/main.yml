@@ -3,6 +3,7 @@ name: AI Code Review
 on:
   pull_request:
     branches: [ "main" ]
+
 permissions:
   contents: read
   pull-requests: write
@@ -14,6 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+
       - name: Get changed files
         id: files
         run: |
@@ -23,32 +29,40 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          # cria o arquivo de review para garantir que ele exista
           echo "## 🤖 Revisão Automática de Código com IA" > review.md
-          
-          # percorre todos os arquivos modificados
-          for file in ${{ steps.files.outputs.files }}; do
-            echo "📂 Analisando $file"
-            content=$(cat $file | head -n 2000 || echo "Arquivo muito grande ou não encontrado")
-            
-            response=$(curl -s https://api.openai.com/v1/chat/completions \
-              -H "Content-Type: application/json" \
-              -H "Authorization: Bearer $OPENAI_API_KEY" \
-              -d "{
-                \"model\": \"gpt-4.1-mini\",
-                \"messages\": [
-                  {\"role\": \"system\", \"content\": \"Você é um revisor de código experiente em Java Spring Boot.\"},
-                  {\"role\": \"user\", \"content\": \"Analise as alterações neste arquivo e descreva: (1) O que mudou, (2) Possíveis impactos, (3) Sugestões de melhoria. Código:\n$content\"}
-                ]
-              }" | jq -r '.choices[0].message.content')
-            
-            echo "### Revisão do arquivo: $file" >> review.md
-            echo "$response" >> review.md
-            echo -e "\n---\n" >> review.md
-             # Aqui você imprime no log do GitHub Actions
-            echo "📝 Revisão do $file:"
-            echo "$response"
-          done
+
+          if [ -z "${{ steps.files.outputs.files }}" ]; then
+            echo "Nenhum arquivo modificado"
+            echo "Nenhum arquivo modificado" >> review.md
+          else
+            for file in ${{ steps.files.outputs.files }}; do
+              echo "📂 Analisando $file"
+              if [ ! -f "$file" ]; then
+                echo "Arquivo não encontrado: $file" >> review.md
+                continue
+              fi
+
+              content=$(head -n 2000 "$file")
+              response=$(curl -s https://api.openai.com/v1/chat/completions \
+                -H "Content-Type: application/json" \
+                -H "Authorization: Bearer $OPENAI_API_KEY" \
+                -d "{
+                  \"model\": \"gpt-4.1-mini\",
+                  \"messages\": [
+                    {\"role\": \"system\", \"content\": \"Você é um revisor de código experiente em Java Spring Boot.\"},
+                    {\"role\": \"user\", \"content\": \"Analise as alterações neste arquivo e descreva: (1) O que mudou, (2) Possíveis impactos, (3) Sugestões de melhoria. Código:\n$content\"}
+                  ]
+                }" | jq -r '.choices[0].message.content')
+
+              echo "### Revisão do arquivo: $file" >> review.md
+              echo "$response" >> review.md
+              echo -e "\n---\n" >> review.md
+
+              # também imprime no log
+              echo "📝 Revisão do $file:"
+              echo "$response"
+            done
+          fi
 
       - name: Comment on PR
         uses: marocchino/sticky-pull-request-comment@v2
