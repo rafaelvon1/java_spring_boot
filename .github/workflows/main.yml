@@ -45,6 +45,9 @@ jobs:
             echo "### Revisão do arquivo: $file" >> review.md
             echo "$response" >> review.md
             echo -e "\n---\n" >> review.md
+             # Aqui você imprime no log do GitHub Actions
+            echo "📝 Revisão do $file:"
+            echo "$response"
           done
 
       - name: Comment on PR
