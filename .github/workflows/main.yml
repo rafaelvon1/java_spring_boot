@@ -1,0 +1,44 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get changed files
+        id: files
+        run: |
+          echo "files=$(git diff --name-only origin/main...HEAD)" >> $GITHUB_OUTPUT
+
+      - name: AI Review with OpenAI
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          for file in ${{ steps.files.outputs.files }}; do
+            echo "📂 Analisando $file"
+            content=$(cat $file | head -n 2000) # evita enviar arquivo gigante
+            response=$(curl -s https://api.openai.com/v1/chat/completions \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer $OPENAI_API_KEY" \
+              -d "{
+                \"model\": \"gpt-4.1-mini\",
+                \"messages\": [
+                  {\"role\": \"system\", \"content\": \"Você é um revisor de código experiente em Java Spring Boot.\"},
+                  {\"role\": \"user\", \"content\": \"Analise as alterações neste arquivo e descreva: (1) O que mudou, (2) Possíveis impactos, (3) Sugestões de melhoria. Código:\n$content\"}
+                ]
+              }" | jq -r '.choices[0].message.content')
+            
+            echo "### Revisão do arquivo: $file" >> review.md
+            echo "$response" >> review.md
+            echo -e "\n---\n" >> review.md
+          done
+
+      - name: Comment on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: review.md
