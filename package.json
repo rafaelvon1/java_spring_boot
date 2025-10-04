@@ -1,13 +1,12 @@
 {
   "name": "java_spring_boot",
   "version": "1.0.0",
-  "description": "Projeto Spring Boot com frontend em React",
+  "description": "Projeto Spring Boot",
   "main": "index.js",
   "scripts": {
     "start": "echo 'Nada para rodar'",
     "build": "echo 'Nada para rodar'",
-    "test": "echo 'Nada para rodar'",
-    "eject": "echo 'Nada para rodar'"
+    "test": "echo 'Nada para rodar'"
   },
   "author": "rafael",
   "license": "ISC",
