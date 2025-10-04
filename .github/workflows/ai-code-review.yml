@@ -25,13 +25,19 @@ jobs:
       working-directory: java_spring_boot
       run: npm install
 
-    # Build do Java Spring Boot
+    # Setup Java
     - name: Setup Java
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: '17'
 
+    # Dar permissão de execução para mvnw
+    - name: Give execute permission to mvnw
+      working-directory: java_spring_boot
+      run: chmod +x mvnw
+
+    # Build Spring Boot project
     - name: Build Spring Boot project
       working-directory: java_spring_boot
       run: ./mvnw clean package
