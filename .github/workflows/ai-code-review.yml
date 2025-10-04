@@ -1,0 +1,36 @@
+name: AI Code Review
+
+# Rodar sempre que houver PR para main
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ai-review:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Pega o código do PR
+      - uses: actions/checkout@v3
+
+      # 2. Configura Node.js (caso use JS/TS)
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      # 3. Instala dependências do projeto
+      - run: npm install
+
+      # 4. Roda lint/testes básicos (opcional)
+      - run: |
+          npx eslint . --max-warnings=0
+          npm test
+
+      # 5. Roda o script de IA para revisar o código
+      - name: AI Review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node .github/scripts/ai-review.js
