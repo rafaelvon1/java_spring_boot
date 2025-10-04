@@ -28,39 +28,39 @@ public class VagasController {
 
     @GetMapping("/vagas")
 
-    public List<Vaga_pcd> getAllProducts() {
-        List<Vaga_pcd> vaga = vagasService.getAllProductsService();
+    public List<Vaga_pcd> getAllvagas() {
+        List<Vaga_pcd> vaga = vagasService.getAllvagas();
         return vaga;
     }
 
     @PostMapping("/vagas/add")
 
-    public ResponseEntity<Vaga_pcd> addProduct(@RequestBody Vaga_pcd vaga_pcd) {
-        Vaga_pcd newProduct = vagasService.insertProdutoService(vaga_pcd);
-        return new ResponseEntity<Vaga_pcd>(newProduct, HttpStatus.OK);
+    public ResponseEntity<Vaga_pcd> addvagas(@RequestBody Vaga_pcd vaga_pcd) {
+        Vaga_pcd newVaga = vagasService.insertVagaService(vaga_pcd);
+        return new ResponseEntity<Vaga_pcd>(newVaga, HttpStatus.OK);
     }
 
     @GetMapping("/vagas/{id}")
-    public ResponseEntity<Optional<Vaga_pcd>> getProductService(@PathVariable Integer id) {
-        Optional<Vaga_pcd> vaga_pcd = vagasService.getProductService(id);
+    public ResponseEntity<Optional<Vaga_pcd>> getVagaId(@PathVariable Integer id) {
+        Optional<Vaga_pcd> vaga_pcd = vagasService.getVagaService(id);
         return ResponseEntity.ok(vaga_pcd);
     }
 
     @DeleteMapping("/vagas/delete/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Integer id){
-        vagasService.deleteProductByIdService(id);
+    public ResponseEntity<Void> deletevagas(@PathVariable Integer id){
+        vagasService.deleteVagasByIdService(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/vagas/update")
-    public ResponseEntity<Vaga_pcd> updateProduct(@RequestBody Vaga_pcd vaga_pcd){
-        Vaga_pcd updatedProduct = vagasService.updateProductService(vaga_pcd);
-        return ResponseEntity.ok(updatedProduct);
+    public ResponseEntity<Vaga_pcd> updatevaga(@RequestBody Vaga_pcd vaga_pcd){
+        Vaga_pcd updatedVaga = vagasService.updateVagaService(vaga_pcd);
+        return ResponseEntity.ok(updatedVaga);
     }
 
     @GetMapping("/vagas/consulta_empresa")
     public ResponseEntity<List<Vaga_pcd>> findByEmpresa(@RequestParam("empresa") String empresa) {
-        List<Vaga_pcd> vagas = vagasService.getallempresa(empresa);
-        return ResponseEntity.ok(vagas);
+        List<Vaga_pcd> viewVagas = vagasService.getAllEmpresaService(empresa);
+        return ResponseEntity.ok(viewVagas);
     }
 }
