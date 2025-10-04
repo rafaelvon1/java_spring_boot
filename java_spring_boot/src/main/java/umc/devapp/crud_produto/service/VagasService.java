@@ -35,4 +35,8 @@ public class VagasService {
         updatedProduct = vaga_pcd;
         return vagasRepository.save(updatedProduct);
     }
+    public List<Vaga_pcd> getallempresa(String empresa){
+        List<Vaga_pcd> vagas = vagasRepository.findByEmpresa(empresa);
+        return vagas;
+    }
 }

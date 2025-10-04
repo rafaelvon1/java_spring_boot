@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vagas de Emprego (PCD)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f5f9;
+      min-height: 100vh;
+    }
+  </style>
+</head>
+<body class="p-6">
+
+  <div class="max-w-5xl mx-auto">
+    <h1 class="text-3xl font-extrabold text-indigo-600 mb-4 text-center">
+      Vagas Disponíveis (PCD)
+    </h1>
+    <p class="text-gray-600 mb-8 text-center">
+      Clique em uma vaga para ver os detalhes completos.
+    </p>
+
+    <!-- Formulário de busca por empresa -->
+    <form id="form-busca" class="flex items-center gap-3 mb-10 justify-center">
+      <input 
+        type="text" 
+        id="empresa" 
+        placeholder="Digite o nome da empresa" 
+        class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+      />
+      <button 
+        type="submit" 
+        class="bg-indigo-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-indigo-700 transition"
+      >
+        Buscar
+      </button>
+    </form>
+
+    <!-- Container das vagas -->
+    <div id="lista-vagas" class="flex flex-col gap-6">
+      <!-- Os cards serão preenchidos via JS -->
+    </div>
+  </div>
+
+  <script src="../scripts/consultar_empresa.js"></script>
+  
+</body>
+</html>
+```
