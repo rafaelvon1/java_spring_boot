@@ -1,36 +1,37 @@
-name: AI Code Review
+name: Java Spring Boot CI
 
-# Rodar sempre que houver PR para main
 on:
+  push:
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
-  ai-review:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Pega o código do PR
-      - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      # 2. Configura Node.js (caso use JS/TS)
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "20"
+    # Instala Node.js (necessário apenas para npm)
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
 
-      # 3. Instala dependências do projeto
-      - run: npm install
+    # Instala dependências do npm (mesmo que não haja)
+    - name: Install Node.js dependencies
+      working-directory: java_spring_boot
+      run: npm install
 
-      # 4. Roda lint/testes básicos (opcional)
-      - run: |
-          npx eslint . --max-warnings=0
-          npm test
+    # Build do Java Spring Boot
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
 
-      # 5. Roda o script de IA para revisar o código
-      - name: AI Review
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          node .github/scripts/ai-review.js
+    - name: Build Spring Boot project
+      working-directory: java_spring_boot
+      run: ./mvnw clean package
