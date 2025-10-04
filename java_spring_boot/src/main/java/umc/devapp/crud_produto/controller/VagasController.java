@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import umc.devapp.crud_produto.entity.Vaga_pcd;
@@ -55,5 +56,11 @@ public class VagasController {
     public ResponseEntity<Vaga_pcd> updateProduct(@RequestBody Vaga_pcd vaga_pcd){
         Vaga_pcd updatedProduct = vagasService.updateProductService(vaga_pcd);
         return ResponseEntity.ok(updatedProduct);
+    }
+
+    @GetMapping("/vagas/consulta_empresa")
+    public ResponseEntity<List<Vaga_pcd>> findByEmpresa(@RequestParam("empresa") String empresa) {
+        List<Vaga_pcd> vagas = vagasService.getallempresa(empresa);
+        return ResponseEntity.ok(vagas);
     }
 }
