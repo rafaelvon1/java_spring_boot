@@ -154,3 +154,24 @@ Vaga com ID 3 deletada com sucesso.
 * **ID** é gerado automaticamente na criação da vaga, mas deve ser informado para atualização e exclusão.
 * Datas devem seguir o formato **YYYY-MM-DD** (ISO 8601).
 * Em caso de erro, a API retorna mensagens padronizadas com o código HTTP correspondente.
+
+---
+
+## 📌 Tabela de Vagas
+
+| Campo              | Descrição                                  | Tipo de dado       |
+|-------------------|-------------------------------------------|------------------|
+| id_vaga           | Identificador único da vaga               | Integer / String |
+| empresa           | Nome da empresa                           | String           |
+| titulo_vaga       | Título da vaga                            | String           |
+| texto             | Descrição detalhada da vaga               | String           |
+| tipo_deficiencia  | Tipo de deficiência compatível (se PCD)  | String           |
+| endereco          | Endereço ou cidade da vaga                | String           |
+| salario           | Salário oferecido                          | Number           |
+| beneficios        | Benefícios incluídos                       | String / Array   |
+| tipo_contrato     | Tipo de contrato (CLT, PJ, Temporário)    | String           |
+| requisitos        | Requisitos e qualificações necessárias    | String / Array  |
+| data_publicacao   | Data em que a vaga foi publicada          | String             |
+| data_expiracao    | Data de expiração da vaga                  | String             |
+
+
