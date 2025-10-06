@@ -109,62 +109,10 @@
             </button>
 
         </form>
-        
-        <!-- Área de Mensagens (Sucesso/Erro) -->
-        <div id="message" class="message-box rounded-lg font-medium text-sm text-center" aria-live="polite"></div>
 
     </div>
-
 <script>
-    // Função utilitária para aplicar classes de mensagem
-    function showMessage(text, isSuccess) {
-        const messageDiv = document.getElementById('message');
-        messageDiv.innerHTML = text;
-        messageDiv.className = 'message-box show rounded-lg font-medium text-sm text-center';
-
-        if (isSuccess) {
-            messageDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-300');
-        } else {
-            // Usamos a mesma classe, mas em um cenário real seria bom usar cores de erro (vermelho)
-            messageDiv.classList.add('bg-yellow-100', 'text-yellow-800', 'border', 'border-yellow-300');
-        }
-
-        // Esconde a mensagem após 6 segundos
-        setTimeout(() => {
-            messageDiv.classList.remove('show');
-            // Remove classes específicas após a transição para limpar o estado
-            setTimeout(() => {
-                messageDiv.className = 'message-box rounded-lg font-medium text-sm text-center';
-                messageDiv.innerHTML = '';
-            }, 500); // 500ms é um bom tempo de transição
-        }, 6000);
-    }
-
-    // Lógica de Submissão do Formulário
-    document.getElementById('interestForm').addEventListener('submit', function(event) {
-        // Previne o comportamento padrão de envio do formulário (que recarregaria a página)
-        event.preventDefault();
-
-        const email = document.getElementById('email').value;
-        const area = document.getElementById('area').value;
-        const salario = document.getElementById('salario').value;
-        
-        // Simulação de Validação
-        if (!email || !area || !salario || salario < 0) {
-            showMessage('Por favor, preencha todos os campos corretamente.', false);
-            return;
-        }
-
-        // SIMULAÇÃO: Processamento dos dados
-        
-        // Exibe a mensagem de sucesso
-        const successMessage = `Obrigado, **${email}**! Seu interesse na área de **${area}** com salário a partir de **R$ ${salario}** foi registrado. Você receberá as vagas por e-mail.`;
-        showMessage(successMessage, true);
-        
-        // Limpa o formulário após o "envio"
-        this.reset();
-    });
+    src ="../scripts/cadastro_usuario.js"
 </script>
-
 </body>
 </html>

@@ -117,12 +117,13 @@ async function buscarVagas(url) {
  * Busca por empresa
  */
 function buscarPorEmpresa(e) {
-    /**operador tenario :) */
+    
     e.preventDefault();
     const empresa = inputEmpresa.value.trim();
     const url = empresa 
         ? `${API_URL}/vagas/consulta_empresa?empresa=${encodeURIComponent(empresa)}`
         : `${API_URL}/vagas`;
+        /**operador tenario :) */
     buscarVagas(url);
 }
 
