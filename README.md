@@ -123,6 +123,33 @@ PUT localhost:8080/vagas/update
   "dataExpiracao": "2025-09-20"
 }
 ```
+---
+### 4. buscar por coluna->empresa
+
+**Endpoint:**
+
+```
+GET localhost:8080/vagas/consulta_empresa?empresa=umc
+```
+
+**Exemplo de Corpo da Requisição (JSON):**
+
+```json
+{
+  "id": 4,
+  "empresa": "umc",
+  "tituloVaga": "RH",
+  "texto": "aaaaaaaaaa",
+  "tipoDeficiencia": "visual",
+  "endereco": "rua matheus",
+  "salario": 1200.0,
+  "beneficios": "salario",
+  "tipoContrato": "clt",
+  "requisitos": "aaaaaaaaaaaaaaaaa",
+  "dataPublicacao": "2025-10-03",
+  "dataExpiracao": "2025-10-22"
+}
+```
 
 ---
 
