@@ -55,5 +55,5 @@ public class VagasController {
     public ResponseEntity<Vaga_pcd> updateProduct(@RequestBody Vaga_pcd vaga_pcd){
         Vaga_pcd updatedProduct = vagasService.updateProductService(vaga_pcd);
         return ResponseEntity.ok(updatedProduct);
-    }
+    }  
 }

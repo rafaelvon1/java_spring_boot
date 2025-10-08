@@ -14,10 +14,18 @@ document.getElementById("login-Form").addEventListener("submit",async function(e
             })
             const msg = document.getElementById("msg")
 
+            //se user e senha estiverem corretor entra na página
             if(response.ok){
                 const text = await response.text()
                 msg.style.color = "green"
                 msg.textContent = text
+
+
+            setTimeout(() => {
+                window.location.href = "../views/index.html";
+        }, 1000);
+
+
             }else {
                 const text = await response.text()
                 msg.style.color = "red"
