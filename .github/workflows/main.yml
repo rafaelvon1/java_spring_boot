@@ -1,8 +1,8 @@
-name: AI Full Code Review
+name: 'AI Full Code Review'
 
 on:
   pull_request:
-    branches: [ "main" ]
+    types: [opened, reopened, synchronize]
 
 permissions:
   contents: read
@@ -12,63 +12,117 @@ permissions:
 jobs:
   review:
     runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      INITIAL_PROMPT: |
+        You are an experienced software engineer performing a code review.
+        Analyze only the diff changes of each file.
+        Focus on:
+        - Security and performance issues
+        - Code quality and readability
+        - Best practices in Java/Spring Boot
+        - Potential bugs and maintainability risks
+        If everything looks fine, return: ✅ File OK.
+        Always start with: "APPROVE" or "REPROVE".
+        Be concise and professional.
+
     steps:
-      - name: Checkout repository
+      - name: 'Checkout Repository'
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # pega todo o histórico para garantir diffs corretos
+          fetch-depth: 0
 
-      - name: Install dependencies
+      - name: 'Install dependencies'
         run: |
           sudo apt-get update
           sudo apt-get install -y jq curl
 
-      - name: Get diff of all changes
-        id: diff
-        run: |
-          # Pega o commit base da branch do PR
-          BASE_SHA=${{ github.event.pull_request.base.sha }}
-          echo "Base commit: $BASE_SHA"
+      - name: 'Clear previous AI comments'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber
+            });
+            for (const comment of comments) {
+              if (comment.user.login === 'github-actions[bot]' || comment.user.login === 'services-infradata') {
+                console.log(`Deleting previous comment ID ${comment.id}`);
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: comment.id
+                });
+              }
+            }
 
-          # Gera o diff completo entre a base e o HEAD da branch do PR
-          git diff $BASE_SHA...HEAD --unified=0 > full_diff.diff
-          echo "diff_file=full_diff.diff" >> $GITHUB_OUTPUT
-
-      - name: AI Review with OpenAI
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - name: 'Run AI Code Review per file'
+        id: ai_review
+        shell: bash
         run: |
-          echo "## 🤖 Revisão Completa de Código com IA" > review.md
+          echo "🔍 Searching for modified files..."
+          CHANGED_FILES=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}")
           
-          if [ ! -f "${{ steps.diff.outputs.diff_file }}" ]; then
-            echo "Nenhum diff encontrado" >> review.md
-          else
-            diff_content=$(head -n 4000 "${{ steps.diff.outputs.diff_file }}" || echo "Diff muito grande")
-            
-            # Chamada à OpenAI
-            response=$(curl -s https://api.openai.com/v1/chat/completions \
-              -H "Content-Type: application/json" \
+          echo "Modified files:"
+          echo "$CHANGED_FILES"
+
+          echo "" > ai_review.md
+
+          for FILE in $CHANGED_FILES; do
+            echo "--- Processing: $FILE ---"
+            FILE_DIFF=$(git diff --unified=0 --color=never "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" -- "$FILE")
+
+            # Skip empty diffs (e.g., deleted files)
+            if [ -z "$FILE_DIFF" ]; then
+              echo "⚠️ No diff found for $FILE. Skipping..."
+              continue
+            fi
+
+            PROMPT="$INITIAL_PROMPT\n\nReviewing file: $FILE\n\nDiff:\n$FILE_DIFF"
+
+            PAYLOAD=$(jq -n \
+              --arg model "gpt-4.1-mini" \
+              --arg prompt "$PROMPT" \
+              '{model: $model, messages: [{role: "user", content: $prompt}], max_tokens: 4000}')
+
+            RESPONSE=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
               -H "Authorization: Bearer $OPENAI_API_KEY" \
-              -d "{
-                \"model\": \"gpt-4.1-mini\",
-                \"messages\": [
-                  {\"role\": \"system\", \"content\": \"Você é um revisor de código experiente em Java Spring Boot.\"},
-                  {\"role\": \"user\", \"content\": \"Analise o diff abaixo e descreva: (1) O que foi adicionado, (2) O que foi deletado, (3) O que foi alterado, (4) Possíveis impactos, (5) Sugestões de melhoria. Diff:\n$diff_content\"}
-                ]
-              }" | jq -r '.choices[0].message.content')
+              -H "Content-Type: application/json" \
+              -d "$PAYLOAD")
 
-            echo "$response" >> review.md
-            echo "📝 Revisão completa gerada pela IA:"
-            echo "$response"
-          fi
+            MODEL_RESPONSE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // "⚠️ No response from model."')
 
-      - name: Upload review artifact
+            echo "## 🧠 Review of \`$FILE\`" >> ai_review.md
+            echo "" >> ai_review.md
+            echo "$MODEL_RESPONSE" >> ai_review.md
+            echo "" >> ai_review.md
+            echo "---" >> ai_review.md
+
+            echo "✅ Review complete for $FILE"
+          done
+
+      - name: 'Post AI review as comment in PR'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const prNumber = context.payload.pull_request.number;
+            const review = fs.readFileSync('ai_review.md', 'utf8');
+            const body = `### 🤖 AI Code Review\n\n${review}\n\n---\n*Automated analysis generated by OpenAI.*`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body
+            });
+
+      - name: 'Upload AI Review Artifact'
         uses: actions/upload-artifact@v4
         with:
           name: ai-review
-          path: review.md
-
-      - name: Comment on PR
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          path: review.md
+          path: ai_review.md
