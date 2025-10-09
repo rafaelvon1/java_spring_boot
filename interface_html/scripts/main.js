@@ -1,6 +1,5 @@
-const API_URL = "http://localhost:8080";
-
 // Buscar todas as vagas
+
 async function fetchDados() {
   try {
     const response = await fetch(`${API_URL}/vagas`);
@@ -23,7 +22,6 @@ async function fetchDados() {
         <td>${vaga.empresa}</td>
         <td>${vaga.tituloVaga}</td>
         <td>${vaga.tipoDeficiencia}</td>
-        <td>R$ ${vaga.salario.toFixed(2)}</td>
         <td>${vaga.dataPublicacao}</td>
         <td>${vaga.dataExpiracao}</td>
         <td>
@@ -60,6 +58,7 @@ async function salvarProduto(event) {
 
   try {
     let response;
+    alert("Vaga salva com sucesso")
     if (id) {
       response = await fetch(`${API_URL}/vagas/update`, {
         method: "PUT",
@@ -90,6 +89,7 @@ async function deletarProduto(id) {
   if (confirm("Deseja excluir esta vaga?")) {
     try {
       const response = await fetch(`${API_URL}/vagas/delete/${id}`, { method: "DELETE" });
+      alert("Vaga Excluida com sucesso")
 
       if (!response.ok) {
         throw new Error("Erro ao excluir vaga");
@@ -98,6 +98,7 @@ async function deletarProduto(id) {
       fetchDados();
     } catch (error) {
       console.error("Erro ao excluir:", error);
+      alert("Erro ao excluir a vaga")
     }
   }
 }
@@ -118,7 +119,6 @@ function editarProduto(id, empresa, tituloVaga, texto, tipoDeficiencia, endereco
   document.getElementById("data_expiracao").value = dataExpiracao;
 }
 
-// Listener do formulário
 document.getElementById("form-produto").addEventListener("submit", salvarProduto);
 
 // Carregar vagas na inicialização

@@ -4,24 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vagas</title>
+    <link rel="stylesheet" href="../styles/allvagas.css">
 </head>
 <body>
-    <h1>Vagas Disponiveis</h1>
-        <table>
-            <tr>
-                <th>Empresa</th>
-                <th>Vaga</th>
-                <th>Deficiência</th>
-                <th>Tipo Contrato</th>
-                <th>Tipo de Deficiência</th>
-                <th>Endereço</th>
-                <th>Benefícios</th>
-                <th>Salário</th>
-                <th>Descrição</th>
-                <th>Requisitos</th>
-                <th>Data de Publicaçao</th>
-                <th>Data Limite</th>
-            </tr>
-        </table>
+    <section>
+        <h2>
+            Vagas Disponiveis
+        </h2>
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th class="vaga">Empresa</th>
+                        <th class="vaga">Título</th>
+                        <th class="vaga">Deficiência</th>
+                        <th class="vaga">Endereço</th>
+                        <th class="vaga">Salário</th>
+                        <th class="vaga">Benefícios</th>
+                        <th class="vaga">Tipo de contrato</th>
+                        <th class="vaga">Requisitos</th>
+                        <th class="vaga">Descrição</th>
+                        <th class="vaga">Publicação</th>
+                        <th class="vaga">Expiração</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-produtos">
+                </tbody>
+            </table>
+<script src="../scripts/config.js"></script>
+<script src="../scripts/allvagas.js"></script>
 </body>
 </html>

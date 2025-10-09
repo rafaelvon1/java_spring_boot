@@ -1,0 +1,18 @@
+h2{
+    text-align: center;
+    color:whitesmoke;
+    background-color:rgb(67 56 202);
+    padding:20px;
+}
+
+.tabela{
+    border-collapse:collapse;
+}
+
+.vaga{
+    padding-bottom:70px;
+    padding-top:70px;
+    padding-left:50px;
+    border-bottom:1px solid black;
+    width:100vw;
+}

@@ -1,43 +1,40 @@
-/* ... (Seu CSS existente para container, header, card, etc.) ... */
-
-/* NOVO ESTILO PARA O FORMULÁRIO DE VAGAS */
 .form-vaga {
     display: flex;
-    flex-direction: column; /* Coloca os grupos em coluna */
-    gap: 15px; /* Espaçamento entre os grupos */
+    flex-direction: column; 
+    gap: 15px; 
 }
 
-/* ESTILOS DE GRID PARA AGRUPAR CAMPOS */
+
 .form-group-grid {
     display: grid;
     gap: 20px;
-    align-items: flex-start; /* Alinha labels no topo */
+    align-items: flex-start; 
 }
 
-/* Grid de duas colunas */
+
 .grid-1-2 {
     grid-template-columns: 1fr 1fr;
 }
 
-/* Grid de três colunas */
+
 .grid-1-3 {
     grid-template-columns: 1fr 1fr 1fr;
 }
 
-/* O form-group simples precisa ser ajustado para funcionar dentro do grid */
+
 .form-group {
     /* Nenhuma alteração aqui, apenas garante que ocupará o espaço do grid */
 }
 
-/* ESTILOS PARA TEXTAREA E INPUT DE DATA */
+
 .input-textarea {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1em;
-    font-family: 'Poppins', sans-serif; /* Garante a fonte para o textarea */
-    resize: vertical; /* Permite redimensionar apenas verticalmente */
+    font-family: 'Poppins', sans-serif; 
+    resize: vertical; 
 }
 
 .input-date {
@@ -48,16 +45,14 @@
     font-size: 1em;
 }
 
-/* BOTÃO DE SALVAR LARGO */
 .full-width-button {
     width: 100%;
-    padding: 15px; /* Maior destaque */
+    padding: 15px;
     font-size: 1.1em;
     margin-top: 10px;
 }
 
 
-/* MEDIA QUERIES PARA RESPONSIVIDADE (IMPORTANTE!) */
 @media (max-width: 768px) {
     /* Em telas menores, o grid deve voltar a ser uma única coluna */
     .grid-1-2,
@@ -67,11 +62,8 @@
 }
 
 
-/* ALTERAÇÃO NA TABELA */
-.tabela-vagas { /* Garante que a nova classe da tabela está estilizada */
-    /* Use os estilos que você já tinha para .tabela-produtos aqui */
+.tabela-vagas { 
     width: 100%;
     border-collapse: collapse;
     background-color: #fff;
-    /* ... outros estilos de tabela ... */
 }
