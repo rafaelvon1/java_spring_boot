@@ -58,7 +58,7 @@ jobs:
           - Sugestões de melhoria e boas práticas
           - Pontos de documentação e clareza de código
 
-          Analise cada trecho abaixo:
+          Analise cada trecho abaix:
 
           {diffs}
           """
