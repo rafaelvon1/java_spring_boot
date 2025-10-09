@@ -1,22 +1,27 @@
-name: 🤖 Gemini Code Review
+name: 🤖 Gemini Full Code Review
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   review:
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout código
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🐍 Instalar dependências Python
+      - name: Install Python dependencies
         run: |
           python3 -m pip install --upgrade pip
-          pip install google-generativeai PyGithub
+          pip install google-generativeai PyGithub requests
 
-      - name: 🤖 Rodar análise com Gemini 1.5 Flash
+      - name: Run Gemini 1.5 Flash Code Review
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -25,50 +30,122 @@ jobs:
         run: |
           python3 <<'EOF'
           import os
-          from github import Github
-          import google.generativeai as genai
+          import sys
+          import json
+          import requests
+          from github import Github, GithubException
 
-          # 🔑 Configurações da API Gemini
-          genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-          model = genai.GenerativeModel("gemini-1.5-flash")
+          # -----------------------------
+          # Verifica variáveis de ambiente
+          # -----------------------------
+          GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+          GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+          REPO_NAME = os.getenv("GITHUB_REPOSITORY")
+          REF = os.getenv("GITHUB_REF")
 
-          # 🧠 Dados do PR
-          repo_name = os.getenv("GITHUB_REPOSITORY")
-          ref = os.getenv("GITHUB_REF")
+          if not GEMINI_API_KEY:
+              print("❌ GEMINI_API_KEY não configurado!")
+              sys.exit(1)
+          if not GITHUB_TOKEN:
+              print("❌ GITHUB_TOKEN não configurado!")
+              sys.exit(1)
+          if not REPO_NAME or not REF:
+              print("❌ Variáveis de ambiente GITHUB_REPOSITORY ou GITHUB_REF ausentes")
+              sys.exit(1)
 
-          # Em PRs o ref vem no formato refs/pull/{num}/merge
-          pr_number = int(ref.split("/")[2])
-          g = Github(os.getenv("GITHUB_TOKEN"))
-          repo = g.get_repo(repo_name)
-          pr = repo.get_pull(pr_number)
+          # -----------------------------
+          # Inicializa GitHub
+          # -----------------------------
+          try:
+              g = Github(GITHUB_TOKEN)
+              repo = g.get_repo(REPO_NAME)
+              pr_number = int(REF.split("/")[2])
+              pr = repo.get_pull(pr_number)
+          except Exception as e:
+              print("❌ Erro ao acessar PR:", e)
+              sys.exit(1)
 
-          print(f"🔍 Analisando PR #{pr_number} de {repo_name}")
+          print(f"🔍 Analisando PR #{pr_number} de {REPO_NAME}")
 
-          # 📄 Monta diffs
+          # -----------------------------
+          # Monta diff
+          # -----------------------------
           diffs = ""
-          for f in pr.get_files():
-              if f.patch:
-                  diffs += f"### {f.filename}\n```diff\n{f.patch}\n```\n\n"
+          try:
+              files = pr.get_files()
+              for f in files:
+                  if f.patch:
+                      diffs += f"### {f.filename}\n```diff\n{f.patch}\n```\n\n"
+          except GithubException as e:
+              print("❌ Erro ao obter arquivos do PR:", e)
+              sys.exit(1)
 
-          # ✍️ Gera prompt
+          if not diffs.strip():
+              print("⚠️ Nenhum diff encontrado para análise.")
+              pr.create_issue_comment("⚠️ Nenhum diff encontrado para análise pelo Gemini.")
+              sys.exit(0)
+
+          # Limita tamanho do diff para 50.000 caracteres (cerca de 1M tokens é muito)
+          if len(diffs) > 50000:
+              diffs = diffs[:50000] + "\n\n[Diff truncado para análise parcial]"
+
+          # -----------------------------
+          # Monta prompt
+          # -----------------------------
           prompt = f"""
-          Faça um code review técnico e detalhado para este Pull Request.
+          Faça uma análise técnica e detalhada deste Pull Request.
           Identifique:
-          - Problemas de lógica, performance ou segurança
-          - Sugestões de melhoria e boas práticas
-          - Pontos de documentação e clareza de código
+          - Problemas de segurança, performance e lógica
+          - Boas práticas de código e legibilidade
+          - Pontos de documentação e manutenção
+          - Sugestões de melhoria
 
-          Analise cada trecho abaixo:
+          Analise os trechos abaixo:
 
           {diffs}
           """
 
-          # 🚀 Chamada ao Gemini
-          response = model.generate_content(prompt)
-          review_text = response.text or "⚠️ Nenhum feedback gerado."
+          # -----------------------------
+          # Chamada à API Gemini
+          # -----------------------------
+          url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
+          headers = {
+              "Authorization": f"Bearer {GEMINI_API_KEY}",
+              "Content-Type": "application/json"
+          }
+          body = {"contents":[{"role":"user","parts":[{"text": prompt}]}]}
 
-          # 💬 Posta comentário no PR
-          pr.create_issue_comment(f"### 🤖 Review automático Gemini\n\n{review_text}")
+          try:
+              response = requests.post(url, headers=headers, data=json.dumps(body), timeout=60)
+          except requests.exceptions.RequestException as e:
+              print("❌ Erro na requisição à Gemini:", e)
+              pr.create_issue_comment(f"❌ Erro na requisição à Gemini: {e}")
+              sys.exit(1)
+
+          if response.status_code != 200:
+              print(f"❌ Status Code {response.status_code}: {response.text}")
+              pr.create_issue_comment(f"❌ Erro na Gemini ({response.status_code}): {response.text}")
+              sys.exit(1)
+
+          try:
+              resp_json = response.json()
+              review_text = resp_json.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+          except json.JSONDecodeError as e:
+              print("❌ Falha ao parsear JSON da Gemini:", e)
+              pr.create_issue_comment(f"❌ Falha ao parsear JSON da Gemini: {e}")
+              sys.exit(1)
+
+          if not review_text:
+              review_text = "⚠️ Nenhum feedback gerado pela Gemini."
+
+          # -----------------------------
+          # Comenta no PR
+          # -----------------------------
+          try:
+              pr.create_issue_comment(f"### 🤖 Review automático Gemini\n\n{review_text}")
+          except GithubException as e:
+              print("❌ Falha ao postar comentário no PR:", e)
+              sys.exit(1)
 
           print("✅ Review postado com sucesso!")
           EOF
