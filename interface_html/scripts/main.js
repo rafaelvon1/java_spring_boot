@@ -9,7 +9,7 @@ async function fetchDados() {
     }
 
     const data = await response.json();
-    const tbody = document.getElementById("tabela-produtos");
+    const tbody = document.getElementById("tabela-vagas");
     tbody.innerHTML = "";
 
     data.forEach(vaga => {
@@ -40,7 +40,7 @@ async function fetchDados() {
 async function salvarProduto(event) {
   event.preventDefault();
 
-  const id = document.getElementById("produto-id").value;
+  const id = document.getElementById("id").value;
   const vaga = {
     id,
     empresa: document.getElementById("empresa").value,
@@ -77,7 +77,7 @@ async function salvarProduto(event) {
       throw new Error("Erro ao salvar vaga");
     }
 
-    document.getElementById("form-produto").reset();
+    document.getElementById("form-vaga").reset();
     fetchDados();
   } catch (error) {
     console.error("Erro ao salvar:", error);
@@ -105,7 +105,7 @@ async function deletarProduto(id) {
 
 // Editar vaga (preenche o formulário)
 function editarProduto(id, empresa, tituloVaga, texto, tipoDeficiencia, endereco, salario, beneficios, tipoContrato, requisitos, dataPublicacao, dataExpiracao) {
-  document.getElementById("produto-id").value = id;
+  document.getElementById("id").value = id;
   document.getElementById("empresa").value = decodeURIComponent(empresa);
   document.getElementById("titulo_vaga").value = decodeURIComponent(tituloVaga);
   document.getElementById("texto").value = texto;
@@ -119,7 +119,7 @@ function editarProduto(id, empresa, tituloVaga, texto, tipoDeficiencia, endereco
   document.getElementById("data_expiracao").value = dataExpiracao;
 }
 
-document.getElementById("form-produto").addEventListener("submit", salvarProduto);
+document.getElementById("form-vaga").addEventListener("submit", salvarProduto);
 
 // Carregar vagas na inicialização
 fetchDados();
