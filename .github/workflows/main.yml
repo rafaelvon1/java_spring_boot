@@ -1,74 +1,112 @@
-name: 🤖 Gemini Code Review
+name: 🤖 Local AI Code Review
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   review:
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout código
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🐍 Instalar dependências Python
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install google-generativeai PyGithub
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
 
-      - name: 🤖 Rodar análise com Gemini 1.5 Flash
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch transformers GitPython PyGithub
+
+      - name: Run Local Model Code Review
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_REF: ${{ github.ref }}
         run: |
           python3 <<'EOF'
           import os
+          import sys
           from github import Github
-          import google.generativeai as genai
+          from git import Repo
+          from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
-          # 🔑 Configurações da API Gemini
-          genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-          model = genai.GenerativeModel("gemini-1.5-flash")
-
-          # 🧠 Dados do PR
-          repo_name = os.getenv("GITHUB_REPOSITORY")
-          ref = os.getenv("GITHUB_REF")
-
-          # Em PRs o ref vem no formato refs/pull/{num}/merge
-          pr_number = int(ref.split("/")[2])
-          g = Github(os.getenv("GITHUB_TOKEN"))
-          repo = g.get_repo(repo_name)
-          pr = repo.get_pull(pr_number)
+          # -----------------------------
+          # Inicializa GitHub
+          # -----------------------------
+          try:
+              g = Github(os.getenv("GITHUB_TOKEN"))
+              repo_name = os.getenv("GITHUB_REPOSITORY")
+              ref = os.getenv("GITHUB_REF")
+              pr_number = int(ref.split("/")[2])
+              pr = g.get_repo(repo_name).get_pull(pr_number)
+          except Exception as e:
+              print("❌ Erro ao acessar PR:", e)
+              sys.exit(1)
 
           print(f"🔍 Analisando PR #{pr_number} de {repo_name}")
 
-          # 📄 Monta diffs
+          # -----------------------------
+          # Coleta diff
+          # -----------------------------
           diffs = ""
           for f in pr.get_files():
               if f.patch:
                   diffs += f"### {f.filename}\n```diff\n{f.patch}\n```\n\n"
 
-          # ✍️ Gera prompt
-          prompt = f"""
-          Faça um code review técnico e detalhado para este Pull Request.
-          Identifique:
-          - Problemas de lógica, performance ou segurança
-          - Sugestões de melhoria e boas práticas
-          - Pontos de documentação e clareza de código
+          if not diffs.strip():
+              print("⚠️ Nenhum diff encontrado")
+              pr.create_issue_comment("⚠️ Nenhum diff encontrado para análise.")
+              sys.exit(0)
 
-          Analise cada trecho abaixo:
+          # -----------------------------
+          # Carrega modelo open-source
+          # -----------------------------
+          model_name = "bigcode/starcoder"  # ou "mistralai/Mistral-7B-Instruct"
+          print(f"⏳ Baixando e carregando modelo {model_name} (pode demorar no primeiro run)...")
+          tokenizer = AutoTokenizer.from_pretrained(model_name)
+          model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto")
+          nlp = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=5000)
+
+          # -----------------------------
+          # Prompt
+          # -----------------------------
+          prompt = f"""
+          Você é um revisor de código experiente. Analise o PR abaixo e descreva:
+          1. O que foi adicionado
+          2. O que foi removido
+          3. Possíveis impactos
+          4. Sugestões de melhoria
 
           {diffs}
           """
 
-          # 🚀 Chamada ao Gemini
-          response = model.generate_content(prompt)
-          review_text = response.text or "⚠️ Nenhum feedback gerado."
+          # -----------------------------
+          # Gera análise
+          # -----------------------------
+          try:
+              output = nlp(prompt, do_sample=True)[0]['generated_text']
+          except Exception as e:
+              print("❌ Erro ao gerar análise:", e)
+              pr.create_issue_comment(f"❌ Erro ao gerar análise local: {e}")
+              sys.exit(1)
 
-          # 💬 Posta comentário no PR
-          pr.create_issue_comment(f"### 🤖 Review automático Gemini\n\n{review_text}")
+          # -----------------------------
+          # Comenta no PR
+          # -----------------------------
+          try:
+              pr.create_issue_comment(f"### 🤖 Local AI Review\n\n{output}")
+          except Exception as e:
+              print("❌ Falha ao postar comentário no PR:", e)
+              sys.exit(1)
 
           print("✅ Review postado com sucesso!")
           EOF
