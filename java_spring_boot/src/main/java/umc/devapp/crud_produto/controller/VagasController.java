@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import umc.devapp.crud_produto.entity.Vaga_pcd;
@@ -27,33 +28,40 @@ public class VagasController {
 
     @GetMapping("/vagas")
 
-    public List<Vaga_pcd> getAllProducts() {
-        List<Vaga_pcd> vaga = vagasService.getAllProductsService();
+    public List<Vaga_pcd> getAllvagas() {
+        List<Vaga_pcd> vaga = vagasService.getAllvagas();
         return vaga;
     }
 
     @PostMapping("/vagas/add")
 
-    public ResponseEntity<Vaga_pcd> addProduct(@RequestBody Vaga_pcd vaga_pcd) {
-        Vaga_pcd newProduct = vagasService.insertProdutoService(vaga_pcd);
-        return new ResponseEntity<Vaga_pcd>(newProduct, HttpStatus.OK);
+    public ResponseEntity<Vaga_pcd> addvagas(@RequestBody Vaga_pcd vaga_pcd) {
+        Vaga_pcd newVaga = vagasService.insertVagaService(vaga_pcd);
+        return new ResponseEntity<Vaga_pcd>(newVaga, HttpStatus.OK);
     }
 
     @GetMapping("/vagas/{id}")
-    public ResponseEntity<Optional<Vaga_pcd>> getProductService(@PathVariable Integer id) {
-        Optional<Vaga_pcd> vaga_pcd = vagasService.getProductService(id);
+    public ResponseEntity<Optional<Vaga_pcd>> getVagaId(@PathVariable Integer id) {
+        Optional<Vaga_pcd> vaga_pcd = vagasService.getVagaService(id);
         return ResponseEntity.ok(vaga_pcd);
     }
 
     @DeleteMapping("/vagas/delete/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Integer id){
-        vagasService.deleteProductByIdService(id);
+    public ResponseEntity<Void> deletevagas(@PathVariable Integer id){
+        vagasService.deleteVagasByIdService(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/vagas/update")
-    public ResponseEntity<Vaga_pcd> updateProduct(@RequestBody Vaga_pcd vaga_pcd){
-        Vaga_pcd updatedProduct = vagasService.updateProductService(vaga_pcd);
-        return ResponseEntity.ok(updatedProduct);
-    }  
+    public ResponseEntity<Vaga_pcd> updatevaga(@RequestBody Vaga_pcd vaga_pcd){
+        Vaga_pcd updatedVaga = vagasService.updateVagaService(vaga_pcd);
+        return ResponseEntity.ok(updatedVaga);
+    }
+
+    @GetMapping("/vagas/consulta_empresa")
+    public ResponseEntity<List<Vaga_pcd>> findByEmpresa(@RequestParam("empresa") String empresa) {
+        List<Vaga_pcd> viewVagas = vagasService.getAllEmpresaService(empresa);
+        return ResponseEntity.ok(viewVagas);
+    }
+
 }

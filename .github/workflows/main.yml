@@ -1,0 +1,74 @@
+name: AI Full Code Review
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # pega todo o histórico para garantir diffs corretos
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+
+      - name: Get diff of all changes
+        id: diff
+        run: |
+          # Pega o commit base da branch do PR
+          BASE_SHA=${{ github.event.pull_request.base.sha }}
+          echo "Base commit: $BASE_SHA"
+
+          # Gera o diff completo entre a base e o HEAD da branch do PR
+          git diff $BASE_SHA...HEAD --unified=0 > full_diff.diff
+          echo "diff_file=full_diff.diff" >> $GITHUB_OUTPUT
+
+      - name: AI Review with OpenAI
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          echo "## 🤖 Revisão Completa de Código com IA" > review.md
+          
+          if [ ! -f "${{ steps.diff.outputs.diff_file }}" ]; then
+            echo "Nenhum diff encontrado" >> review.md
+          else
+            diff_content=$(head -n 4000 "${{ steps.diff.outputs.diff_file }}" || echo "Diff muito grande")
+            
+            # Chamada à OpenAI
+            response=$(curl -s https://api.openai.com/v1/chat/completions \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer $OPENAI_API_KEY" \
+              -d "{
+                \"model\": \"gpt-4.1-mini\",
+                \"messages\": [
+                  {\"role\": \"system\", \"content\": \"Você é um revisor de código experiente em Java Spring Boot.\"},
+                  {\"role\": \"user\", \"content\": \"Analise o diff abaixo e descreva: (1) O que foi adicionado, (2) O que foi deletado, (3) O que foi alterado, (4) Possíveis impactos, (5) Sugestões de melhoria. Diff:\n$diff_content\"}
+                ]
+              }" | jq -r '.choices[0].message.content')
+
+            echo "$response" >> review.md
+            echo "📝 Revisão completa gerada pela IA:"
+            echo "$response"
+          fi
+
+      - name: Upload review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-review
+          path: review.md
+
+      - name: Comment on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: review.md
