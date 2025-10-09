@@ -1,0 +1,78 @@
+name: 🤖 Auto Documentation Generator (Gemini)
+
+on:
+  push:
+    branches: [ "main" ]  # Apenas mudanças na main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  generate_docs:
+    runs-on: ubuntu-latest
+
+    env:
+      GCP_TOKEN: ${{ secrets.GCP_TOKEN }}
+      MAX_DIFF_LINES: 300  # Limite de linhas de diff por arquivo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Documentation from Diff
+        shell: bash
+        run: |
+          echo "🔍 Gerando documentação a partir da main branch"
+
+          BASE_SHA=$(git rev-parse HEAD~1)  # pega o commit anterior
+          HEAD_SHA=$(git rev-parse HEAD)
+
+          CHANGED_FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "⚠️ Nenhum arquivo modificado."
+            exit 0
+          fi
+
+          touch auto_docs.md
+
+          for FILE in $CHANGED_FILES; do
+            echo "--- Processando: $FILE ---"
+
+            FILE_DIFF=$(git diff --unified=0 --color=never "$BASE_SHA" "$HEAD_SHA" -- "$FILE")
+            FILE_DIFF=$(echo "$FILE_DIFF" | head -n $MAX_DIFF_LINES)
+
+            if [ -z "$FILE_DIFF" ]; then
+              echo "⚠️ Diff vazio ou truncado"
+              echo "✅ File OK" >> auto_docs.md
+              continue
+            fi
+
+            FULL_PROMPT="Você é um assistente de documentação de código. Baseado neste diff, gere documentação clara, com:  
+- Funções e métodos adicionados  
+- Classes criadas  
+- Pequena descrição do que cada parte faz  
+- Formato Markdown pronto para README ou doc interna
+
+Diff:\n$FILE_DIFF"
+
+            RESPONSE=$(curl -s -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5" \
+              -H "Authorization: Bearer $GCP_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --arg prompt "$FULL_PROMPT" '{prompt: $prompt, maxOutputTokens: 700}')")
+
+            MODEL_OUTPUT=$(echo "$RESPONSE" | jq -r '.candidates[0].content // "⚠️ Nenhuma resposta retornada."')
+
+            echo "## Documentação de $FILE" >> auto_docs.md
+            echo "$MODEL_OUTPUT" >> auto_docs.md
+            echo "" >> auto_docs.md
+          done
+
+      - name: Upload Documentation Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-documentation
+          path: auto_docs.md
