@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin(origins = "*")
 public class LoginController {
+    //endpoint do login
     @PostMapping("/login")
     public ResponseEntity<String> login (@RequestBody LoginRequest loginrequest){
+        //verificação em caso de erro
         if(loginrequest == null){
             return ResponseEntity.status(400).body("Requisição inválida");
         }
@@ -34,6 +36,7 @@ public class LoginController {
             private String username;
             private String password;
     
+            // construtor vazio para o spring instanciar a classe
             public LoginRequest(){
 
             }
