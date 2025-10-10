@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="../styles/login.css">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="login">
+    <h2>Login</h2>
+        <form id="login-Form">
+            <label for="">User : </label>
+            <input type="text" id="username" placeholder="Usuário" required><br>
+            <label for="">Senha : </label>
+            <input type="password" id="password" placeholder="Senha" required><br>
+            <button type="submit">Entrar</button>
+        </form>
+        <p id="msg"></p>
+    </div>
+</body>
+<script src="../scripts/config.js"></script>
+<script src="../scripts/login.js"></script>
+</html>

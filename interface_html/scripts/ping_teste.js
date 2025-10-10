@@ -1,6 +1,6 @@
 async function fetchDados() {
     try {
-        const response = await fetch("http://localhost:8080/produtos"); // <--- corrigido
+        const response = await fetch("http://localhost:8080/produtos"); 
         if (!response.ok) {
             throw new Error("Conexão falhou");
         }

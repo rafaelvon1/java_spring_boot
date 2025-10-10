@@ -1,0 +1,42 @@
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height:100vh;
+}
+
+.login{
+    padding:60px;
+}
+
+.login > h2 {
+    text-align: center;
+    color:rgb(67 56 202);
+}
+
+input{
+    border:none;
+    border-radius:5px;
+    margin:10px;
+    padding:5px;
+}
+
+input:focus{
+    outline:none;
+    border-color: #3b82f6; 
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); 
+}
+
+button{
+    border:1px solid black;
+    border-radius: 5px;
+    margin-top:30px;
+    padding:10px;
+    width:300px;
+}
+
+button:hover{
+    cursor: pointer;
+    background-color:rgb(67 56 202);
+    color:whitesmoke;
+}

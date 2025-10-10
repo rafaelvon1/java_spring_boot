@@ -63,4 +63,5 @@ public class VagasController {
         List<Vaga_pcd> viewVagas = vagasService.getAllEmpresaService(empresa);
         return ResponseEntity.ok(viewVagas);
     }
+
 }
